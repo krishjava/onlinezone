@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+     http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd
+    ">
+<context:component-scan base-package="com.onlinezone" />
+
+<mvc:annotation-driven />
+<mvc:resources location="/WEB-INF/asset/" mapping="/asset/**" />
+
+	<!-- View Resolver configuration -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		name="viewResolver">
+		<property name="prefix" value="/WEB-INF/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+
+<!--  DataSourece Properties -->
+	<bean
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		name="ds">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    	<property name="url" value="jdbc:mysql://localhost:3306/onlinezone" />
+    	<property name="username" value="root" />
+    	<property name="password" value="" />
+	</bean>
+	
+	<bean
+			class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+			name="factory">
+			<property name="dataSource" ref="ds"></property>
+			<!-- Hibernate Properties -->
+			<property name="hibernateProperties">
+				<props>
+					<prop key="hibernate.dialect">org.hibernate.dialect.MySQL55Dialect</prop>
+					<prop key="hibernate.show_sql">true</prop>
+					<prop key="hibernate.hbm2ddl.auto">update</prop>
+				</props>
+			</property>
+			<!-- Annotated Classes -->
+			<property name="annotatedClasses">
+				<list>
+					<!-- admin model -->
+					<value>com.onlinezone.entities.Subject</value>
+					<value>com.onlinezone.entities.QuestionModel</value>
+					<value>com.onlinezone.entities.AnswerModel</value>
+					
+					<!-- front controller  -->
+					<value>com.onlinezone.front.model.User</value>
+				</list>
+			</property>
+		</bean>
+		
+		
+	<!-- set HibernateTemplate property -->
+	<bean class="org.springframework.orm.hibernate5.HibernateTemplate"
+		name="hibernateTemplate">
+		<property name="sessionFactory" ref="factory"></property>
+	</bean>
+	
+	<!--  this enable @Transactional    annotation -->
+   	 <tx:annotation-driven />
+   	 <bean class="org.springframework.orm.hibernate5.HibernateTransactionManager" name="transactionManager">
+		<property name="sessionFactory" ref="factory" />
+	</bean>
+	
+	<!-- configuration of custom annoation  hibernate validator  -->
+	<bean class="org.springframework.context.support.ResourceBundleMessageSource" id="messageSource">
+		<property name="basename" value="message"></property>
+	</bean>
+	<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" id="factoryBean">
+		<property name="validationMessageSource" ref="messageSource"></property>
+	</bean>
+	<mvc:annotation-driven validator="factoryBean" />
+	
+	
+	
+</beans>
