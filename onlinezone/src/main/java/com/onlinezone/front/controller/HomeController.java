@@ -184,24 +184,14 @@ public class HomeController {
 		}
 	}
 	
-	@RequestMapping(path = "/saveanswer",method = RequestMethod.POST)
-	public String saveAnswer(@Valid @ModelAttribute("answer") AnswerModel answer,BindingResult result,Model model) {
-		System.out.println("saveanswer");
-		if(result.hasErrors()) {
-			
-//			System.out.println("url : "+ServletUriComponentsBuilder.fromCurrentRequest()
-//	        .queryParam("", answer.getId())
-//	        .toUriString());    http://localhost:13594/onlinezone/onlinezone.com/question-detail/20
-			UriComponents uri = UriComponentsBuilder
-                    .fromHttpUrl("http://localhost:13594/onlinezone/onlinezone.com/question-detail/{id}")
-                    .buildAndExpand(answer.getId());
-			System.out.println("URL : "+uri);
-			return uri.toString();
-		}else {
-			answerDao.saveAnswer(answer);
-			return "redirect:/onlinezone.com/question-detail/"+answer.getQuestion_id();
-		}
-		
+	@RequestMapping(path = "/saveanswer",method = RequestMethod.POST) 
+	public String saveAnswer(@Valid @ModelAttribute("answer") AnswerModel answer,BindingResult result,Model model) { 
+		if(result.hasErrors()) { 
+			return "question-detail/"+answer.getQuestion_id(); 
+		}else { 
+			answerDao.saveAnswer(answer); 
+			return "redirect:/onlinezone.com/question-detail/"+answer.getQuestion_id(); 
+		} 
 	}
 	
 	@RequestMapping("/login")
